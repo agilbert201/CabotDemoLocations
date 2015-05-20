@@ -40,7 +40,6 @@
       minZoom: 7,
       maxZoom: 14
     });
-    //.setView([44.184292,-72.838890], 8);
 
     var demoLocations = L.mapbox.featureLayer()
       .loadURL('data/walmart_june_demos.geojson');
@@ -49,7 +48,7 @@
     geocoderControl.addTo(demoLocationMap);
 
     demoLocations.on("ready", function(e) {
-        console.log("featureLayer ready");
+        //console.log("featureLayer ready");
 
         demoLocations.eachLayer(function(location) {
             var demoDate = location.feature.properties.Date;
@@ -72,19 +71,20 @@
 
         demoLocations.addTo(demoLocationMap);
         demoLocationMap.fitBounds(demoLocations.getBounds());
-        console.log("center of demolocations %s", demoLocations.getBounds().getCenter());
+        //console.log("center of demolocations %s", demoLocations.getBounds().getCenter());
         demoLocationMap.setMaxBounds(demoLocations.getBounds());
     });
 
+    /*
     geocoderControl.on("found", function(e) {
       var locationsCenter = demoLocations.getBounds().getCenter();
       var closeEnough = _.filter(e.results.features, function (f) {
         var featureLatLng = new L.latLng(f.center[1], f.center[0]);
         var distance = featureLatLng.distanceTo(locationsCenter);
-        console.log("distance %d", distance);
+        //console.log("distance %d", distance);
         return distance < 1000000;
       });
-      console.log("geocoder found");
+      //console.log("geocoder found");
     });
 
     var mapRef = demoLocationMap;
@@ -99,6 +99,7 @@
     demoLocationMap.on("zoomend", function(e) {
       console.log("zoomend %s", e.target._zoom);
     });
+    */
 });
 
 </script>
