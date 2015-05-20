@@ -14,8 +14,8 @@
     <div id='demo-location-map' class='map'> </div>
 </body>
 
-<script src="/js/jquery.min.js"></script>
-<script src="/js/underscore.min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/underscore.min.js"></script>
 
 <script id="popup-tpl" type="text/html">
     <h3>Walmart Supercenter <%= StoreNumber %></h3>
@@ -43,7 +43,7 @@
     //.setView([44.184292,-72.838890], 8);
 
     var demoLocations = L.mapbox.featureLayer()
-      .loadURL('/data/walmart_june_demos.geojson');
+      .loadURL('data/walmart_june_demos.geojson');
 
     var geocoderControl = L.mapbox.geocoderControl('mapbox.places', { pointZoom: 10 });
     geocoderControl.addTo(demoLocationMap);
