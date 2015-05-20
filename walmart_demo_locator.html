@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8 />
+    <title></title>
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        .map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+    <div id='demo-location-map' class='map'> </div>
+</body>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/underscore.min.js"></script>
+
+<script id="popup-tpl" type="text/html">
+    <h3>Walmart Supercenter <%= StoreNumber %></h3>
+    <div class="description">
+      <address>
+      <%= Address %>
+      <%= City %>, <%= State %>
+      </address>
+      <p>Demo Date: <%= Date %></p>
+    </div>
+</script>
+
+<script>
+
+  $(function() {
+
+    L.mapbox.accessToken = 'pk.eyJ1IjoiYWdpbGJlcnQyMDEiLCJhIjoiVng1TjdGdyJ9.V6IYlPxVIB6xsMH1j2v0Pg';
+    var popUpTpl = _.template($("#popup-tpl").html());
+
+    var demoLocationMap = L.mapbox.map('demo-location-map', 'agilbert201.m7ip42pc', {
+      scrollWheelZoom: false,
+      minZoom: 7,
+      maxZoom: 14
+    });
+    //.setView([44.184292,-72.838890], 8);
+
+    var demoLocations = L.mapbox.featureLayer()
+      .loadURL('/data/walmart_june_demos.geojson');
+
+    var geocoderControl = L.mapbox.geocoderControl('mapbox.places', { pointZoom: 10 });
+    geocoderControl.addTo(demoLocationMap);
+
+    demoLocations.on("ready", function(e) {
+        console.log("featureLayer ready");
+
+        demoLocations.eachLayer(function(location) {
+            var demoDate = location.feature.properties.Date;
+            var markerSize = "medium";
+            var markerColor = "#FF0000";
+
+            if (demoDate === "6/7/2015") {
+                markerColor = "#00FF00";
+            }
+
+            location.setIcon(L.mapbox.marker.icon({
+                "marker-size": markerSize,
+                "marker-color": markerColor
+            }));
+
+            var popUpHtml = popUpTpl(location.feature.properties);
+            location.bindPopup(popUpHtml);
+
+        });
+
+        demoLocations.addTo(demoLocationMap);
+        demoLocationMap.fitBounds(demoLocations.getBounds());
+        console.log("center of demolocations %s", demoLocations.getBounds().getCenter());
+        demoLocationMap.setMaxBounds(demoLocations.getBounds());
+    });
+
+    geocoderControl.on("found", function(e) {
+      var locationsCenter = demoLocations.getBounds().getCenter();
+      var closeEnough = _.filter(e.results.features, function (f) {
+        var featureLatLng = new L.latLng(f.center[1], f.center[0]);
+        var distance = featureLatLng.distanceTo(locationsCenter);
+        console.log("distance %d", distance);
+        return distance < 1000000;
+      });
+      console.log("geocoder found");
+    });
+
+    var mapRef = demoLocationMap;
+    demoLocationMap.on("load", function(e) {
+      //console.log("map load with center: %s", mapRef.GetCenter());
+    });
+
+    demoLocationMap.on("viewreset", function(e) {
+      //console.log("viewreset with center: %s", mapRef.GetCenter());
+    });
+
+    demoLocationMap.on("zoomend", function(e) {
+      console.log("zoomend %s", e.target._zoom);
+    });
+});
+
+</script>
+</body>
+</html>
